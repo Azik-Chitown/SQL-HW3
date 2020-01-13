@@ -1,0 +1,30 @@
+--
+drop table Restaurant_Locations;
+Create table Restaurant_Locations(
+	rID int, 
+	street_address varchar2(100),
+	city varchar2(100), 
+	state varchar(3), 
+	zipcode varchar2(5), 
+	cuisine varchar2(100));
+
+DECLARE
+ rid RESTAURANT.RID%TYPE;
+ street_address RESTAURANT.ADDRESS%TYPE;
+ city RESTAURANT.ADDRESS%TYPE;
+ state RESTAURANT.ADDRESS%TYPE;
+ zipcode RESTAURANT.ADDRESS%TYPE;
+ cuisine RESTAURANT.CUISINE%TYPE;
+ 
+ cursor cur is 
+ select rid, REGEXP_SUBSTR (ADDRESS, '(\S*)(\s)(\S*)(\s)(\S*)(\s)'), rtrim((REGEXP_SUBSTR (ADDRESS, '[^ ]*,',1, 1)), ','), ltrim((REGEXP_SUBSTR (ADDRESS, ', [^ ]*',1, 1)), ','), SUBSTR (Address, length(Address)-4, 5), cuisine
+ from Restaurant;
+ BEGIN
+ OPEN cur;
+ loop
+ fetch cur into rid, street_address, city, state, zipcode, cuisine;
+ Exit when cur%NotFound;
+ insert into Restaurant_Locations Values(rid, street_address, city, state, zipcode, cuisine);
+ end loop; 
+ close cur;
+ end;
